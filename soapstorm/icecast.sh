@@ -3,6 +3,7 @@
 SOAPSTORM_NAME=${SOAPSTORM_NAME:-Marquee}
 SOAPSTORM_EMAIL=${SOAPSTORM_EMAIL:-curtis@lassam.net}
 SOAPSTORM_DOMAIN=${SOAPSTORM_DOMAIN:-radio.marquee.click}
+SOAPSTORM_STREAM=${SOAPSTORM_STREAM:-Marquee}
 
 SOAPSTORM_USER=${SOAPSTORM_USER:-user}
 SOAPSTORM_PASS=${SOAPSTORM_PASS:-pass}
@@ -91,9 +92,9 @@ cat >./icecast.xml <<END
             <option name="password" value="$SOAPSTORM_PASS"/>
             <option name="auth_header" value="icecast-auth-user: 1"/>
         </authentication>
-        <stream-name>My Radio</stream-name>
+        <stream-name>$SOAPSTORM_NAME</stream-name>
         <stream-description>Streaming music.</stream-description>
-        <stream-url>http://mydomain.com</stream-url>
+        <stream-url>http://$DOMAIN</stream-url>
     </mount>
 </icecast>
 END
