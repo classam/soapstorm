@@ -2,23 +2,23 @@
 
 SOAPSTORM_NAME=${SOAPSTORM_NAME:-Marquee Radio}
 SOAPSTORM_EMAIL=${SOAPSTORM_EMAIL:-marquis@marquee.click}
-SOAPSTORM_DOMAIN=${SOAPSTORM_DOMAIN:-radio.marquee.click}
+SOAPSTORM_DOMAIN=${SOAPSTORM_DOMAIN:-hexhelloworld.com}
 SOAPSTORM_STREAM=${SOAPSTORM_STREAM:-Marquee}
 
 SOAPSTORM_USER=${SOAPSTORM_USER:-turbofunkradio}
-SOAPSTORM_PASS=${SOAPSTORM_PASS:-asdasdasdasdasd}
+SOAPSTORM_PASS=${SOAPSTORM_PASS:-veryincredibledudes}
 
 ICECAST_CONTAINER_NAME=${ICECAST_CONTAINER_NAME:-soapstorm-icecast}
 ICECAST_USER=${ICECAST_USER:-soapybutt}
-ICECAST_SOURCE_PASSWORD=${ICECAST_PASSWORD:-asdasdasdasd}
-ICECAST_RELAY_PASSWORD=${ICECAST_PASSWORD:-popopopopopop}
+ICECAST_SOURCE_PASSWORD=${ICECAST_PASSWORD:-stormybutts}
+ICECAST_RELAY_PASSWORD=${ICECAST_PASSWORD:-tormybsutto}
 ICECAST_ADMIN=${ICECAST_USER:-buttsoap}
-ICECAST_ADMIN_PASSWORD=${ICECAST_PASSWORD:-gorpgorpgorpgorp}
+ICECAST_ADMIN_PASSWORD=${ICECAST_PASSWORD:-stormybuttsoapington}
 ICECAST_PORT=8000
 
 LIQUIDSOAP_CONTAINER_NAME=${LIQUIDSOAP_CONTAINER_NAME:-soapstorm-liquidsoap}
 LIQUIDSOAP_PORT=9051
-LIQUIDSOAP_PASSWORD=${LIQUIDSOAP_PASSWORD:-horphorphorphorp}
+LIQUIDSOAP_PASSWORD=${LIQUIDSOAP_PASSWORD:-potatomoto}
 
 HOST_MUSIC_DIRECTORY=${HOST_MUSIC_DIRECTORY:-/data/dropbox/Dropbox/Music}
 MOUNT_MUSIC_DIRECTORY=${MOUNT_MUSIC_DIRECTORY:-/tmp/music}
@@ -105,7 +105,7 @@ cat >./icecast.xml <<END
 END
 
 sudo docker run \
-    -p $ICECAST_PORT:$ICECAST_PORT \
+    -p 127.0.0.1:$ICECAST_PORT:$ICECAST_PORT \
     --name $ICECAST_CONTAINER_NAME \
     -v `pwd`/icecast.xml:/etc/icecast2/icecast.xml \
     -d moul/icecast
@@ -123,7 +123,7 @@ sudo docker rm $LIQUIDSOAP_CONTAINER_NAME
 cat >./liquidsoap.liq <<END
 #!/usr/bin/liquidsoap
 
-set("log.level", 4)
+set("log.level", 3)
 set("log.file", false)
 set("log.stdout", true)
 
@@ -131,34 +131,27 @@ enable_replaygain_metadata()
 
 offline_file = single("$OFFLINE_FILE")
 
-high_frequency = playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/High Frequency Grooves")
-mid_frequency = playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/Filler Grooves")
-low_frequency = playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/Very Rare Grooves")
-interludes = playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/Interludes")
+holiday_tinglers = audio_to_stereo(playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/Holiday Tinglers"))
+high_frequency = audio_to_stereo(playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/High Frequency Grooves"))
+mid_frequency = audio_to_stereo(playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/Filler Grooves"))
+low_frequency = audio_to_stereo(playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/Very Rare Grooves"))
+interludes = audio_to_stereo(playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/Interludes"))
+chill = audio_to_stereo(playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Chill"))
+promos = audio_to_stereo(playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/Promos"))
 
-chill = playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Chill")
-
-pre_radio = random(weights=[1,1,1,1], [high_frequency, mid_frequency, low_frequency, interludes])
+pre_radio = random(weights=[0,3,1,3,3,2,1], [holiday_tinglers, chill, high_frequency, mid_frequency, low_frequency, interludes, promos])
 groove_radio = fallback(track_sensitive = false, [pre_radio, offline_file])
 groove_radio = amplify(1., override="replay_gain", groove_radio)
-
-chill_radio = fallback(track_sensitive = false, [chill, offline_file])
-chill_radio = amplify(1., override="replay_gain", chill_radio)
 
 output.icecast(%vorbis,
     host = "$ICECAST_HOST", port = $ICECAST_PORT,
     password = "$ICECAST_SOURCE_PASSWORD", mount = "$GROOVE_MOUNT_POINT",
     groove_radio)
 
-output.icecast(%vorbis,
-    host = "$ICECAST_HOST", port = $ICECAST_PORT,
-    password = "$ICECAST_SOURCE_PASSWORD", mount = "$CHILL_MOUNT_POINT",
-    chill_radio)
-
 END
 
 sudo docker run \
-    -p $LIQUIDSOAP_PORT:$LIQUIDSOAP_PORT \
+    -p 127.0.0.1:$LIQUIDSOAP_PORT:$LIQUIDSOAP_PORT \
     --name $LIQUIDSOAP_CONTAINER_NAME \
     -v `pwd`/liquidsoap.liq:/tmp/config.liq \
     -v $HOST_MUSIC_DIRECTORY:$MOUNT_MUSIC_DIRECTORY \
