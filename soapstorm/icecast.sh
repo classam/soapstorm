@@ -139,7 +139,7 @@ interludes = audio_to_stereo(playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/Int
 chill = audio_to_stereo(playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Chill"))
 promos = audio_to_stereo(playlist("$MOUNT_MUSIC_DIRECTORY/Icecast Groove/Promos"))
 
-pre_radio = random(weights=[0,3,1,3,3,2,1], [holiday_tinglers, chill, high_frequency, mid_frequency, low_frequency, interludes, promos])
+pre_radio = random(weights=[0,1,2,3,3,2,1], [holiday_tinglers, chill, high_frequency, mid_frequency, low_frequency, interludes, promos])
 groove_radio = fallback(track_sensitive = false, [pre_radio, offline_file])
 groove_radio = amplify(1., override="replay_gain", groove_radio)
 
