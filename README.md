@@ -5,14 +5,4 @@ I want to use docker containers to build a [rainwave](https://github.com/rmcaule
 
 First, install docker
 
-Then, install some local 'buntu deps
-
-    apt-get install jq
-
-Then, install memcached with
-
-    ./memcached.sh
-
-Then, install postgres with
-
-    ./postgres.sh
+Then, uh, modify and run icecast.sh. It probably doesn't do what you want, yet.
